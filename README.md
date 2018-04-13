@@ -6,6 +6,6 @@ This project deploys a pyspark model that is used to predict the next NLF play. 
 <br>1) Download this repo
 <br>2) <code>./build.sh</code>
 <br>3) <code>./run.sh</code>
-<br>4) Open up your browser and go to <a href="http://localhost:14444>http://localhost:14444</a>
+<br>4) Open up your browser and go to <a href="http://localhost:14444">http://localhost:14444</a>
 <br>
 <br>
