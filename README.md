@@ -5,10 +5,10 @@ This project deploys a pyspark model that is used to predict the next NLF play. 
 <br>
 <br>NOTE: Before you begin, make sure you have Docker installed. This app is deployed and runs within a docker container.
 <br>
-<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull;&nbsp;<br>1) Download this repo
-<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull;&nbsp;<br>2) <code>./build.sh</code>
-<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull;&nbsp;<br>3) <code>./run.sh</code>
-<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull;&nbsp;<br>4) Wait a minute or two, then open up your browser and go to <a href="http://localhost:14444">http://localhost:14444</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull;&nbsp;1) Download this repo
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull;&nbsp;2) <code>./build.sh</code>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull;&nbsp;3) <code>./run.sh</code>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull;&nbsp;4) Wait a minute or two, then open up your browser and go to <a href="http://localhost:14444">http://localhost:14444</a>
 <br>
 <br><img src="images/screenshot1.png" class="inline"/>
 <br>
