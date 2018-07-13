@@ -10,7 +10,7 @@ This project deploys a pyspark model that is used to predict the next NLF play. 
 <br>&nbsp;&nbsp;&nbsp;&nbsp;3) <code>./run.sh</code>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;4) Wait a minute or two, then open up your browser and go to <a href="http://localhost:14444">http://localhost:14444</a>
 <br>
-<br><b>Addition:</b>
+<br><b>Bonus (for real-time scoring):</b>
 <br>I have included an Apache NiFi template, called NFL_Spark_Model_Scoring.xml. This template can be loaded into Apache NiFi. Once loaded, it'll enable users to ingest, process, and score real-time play-by-play data against this REST-based Spark Web App. The incoming data stream may come from an API, a message bus (such as Kafka or JMS), or another real-time (or static) data source.
 <br>
 <br><img src="images/screenshot1.png" class="inline"/>
