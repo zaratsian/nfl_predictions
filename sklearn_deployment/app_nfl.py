@@ -30,36 +30,39 @@ playtypes       = ['FirstPlay','Run','Pass']
 
 list_of_teams   = [u'NYJ', u'CAR', u'TB', u'OAK', u'DET', u'TEN', u'BUF', u'BAL', u'NE', u'GB', u'JAC', u'DEN', u'ARI', u'SF', u'KC', u'SEA', u'CIN', u'DAL', u'CLE', u'MIA', u'SD', u'STL', u'MIN', u'ATL', u'PHI', u'WAS', u'NYG', u'PIT', u'NO', u'IND', u'HOU', u'CHI']
 
+data_header     = ['Date', 'GameID', 'Drive', 'qtr', 'down', 'time', 'TimeUnder', 'TimeSecs', 'PlayTimeDiff', 'yrdline100', 'ydstogo', 'ydsnet', 'FirstDown', 'posteam', 'DefensiveTeam', 'Yards_Gained', 'Touchdown', 'PlayType', 'PassLength', 'PassLocation', 'RunLocation', 'PosTeamScore', 'DefTeamScore', 'month_day', 'PlayType_lag']
+
 ################################################################################################
 #
 #   Functions
 #
 ################################################################################################
 
-def import_csv(filepath_with_name):
+def import_csv(filepath_with_name, header=False):
+    header = ''
+    rows   = []
     try:
-        file = csv.reader(open(filepath_with_name, 'rb'))
+        csv_file = open(filepath_with_name)
+        csv_reader = csv.reader(csv_file, delimiter=',')
+        for i,row in enumerate(csv_reader):
+            try:
+                if (i == 0) and (header):
+                    header = row
+                else:
+                    rows.append(row)
+            except:
+                pass
         
-        # Header
-        header  = file.next()
-        
-        row_count = 0
-        rows      = []
-        for row in file:
-            rows.append(row)
-            row_count = row_count + 1
-        
-        col_count = len(row)
+        csv_file.close()
     except:
         rows = 'Error in data location or format'
         header    = ''
-        col_count = ''
-        row_count = ''
     
     return header, rows
 
 
-header, rawdata = import_csv('/static/assets/nfldata2.csv')
+header, rawdata = import_csv( os.path.join( os.getcwd(), 'static/assets/nfldata2.csv') )
+header = data_header
 
 
 def get_next_play(rawdata, row_number):
