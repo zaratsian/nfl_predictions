@@ -9,7 +9,13 @@ from werkzeug.utils import secure_filename
 import requests
 import datetime, time
 import numpy as np
+import argparse
+import pandas as pd
 
+import warnings
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore")
+    from sklearn.externals import joblib
 
 ################################################################################################
 #
@@ -71,90 +77,76 @@ def get_next_play(rawdata, row_number):
     return record, date
 
 
-def predict_play(model_pass, model_run, qtr, down, TimeSecs, yrdline100, ydstogo, ydsnet, month_day, posteam, DefensiveTeam, PlayType_lag):
+def score_data(path_to_model, df_to_score):
     
-    input_df = spark.createDataFrame( [(qtr, down, TimeSecs, yrdline100, ydstogo, ydsnet, month_day, posteam, DefensiveTeam, PlayType_lag)], ['qtr','down','TimeSecs','yrdline100','ydstogo','ydsnet','month_day', 'posteam', 'DefensiveTeam', 'PlayType_lag'])
+    #print('[ INFO ] Loading model from {}'.format(path_to_model))
+    model_obj = joblib.load(path_to_model)
     
-    passing_yards = model_pass.transform(input_df).select('prediction').collect()[0][0]
-    running_yards = model_run.transform(input_df).select('prediction').collect()[0][0]
+    scores = model_obj.predict(df_to_score)
+    df_to_score['predicted'] = scores
     
-    best_play     = 'Passing Play' if passing_yards > running_yards else 'Running Play'
-    
-    return best_play, passing_yards, running_yards
+    # Returns dataframe with predictions appended to last column
+    return df_to_score
 
 
-def predict_play_livy(model_pass, model_run, qtr, down, TimeSecs, yrdline100, ydstogo, ydsnet, month_day, PlayType_lag):
+def transform_df(rawdata, target_variable_name=None):
     
-    code_payload = {'code': '''
+    # Model Variables (Specify id, target, numeric variables, and categorical variables)
+    var_id              = ''
+    var_target          = target_variable_name #'Yards_Gained'
+    var_date            = 'Date'
+    var_numeric         = ['Drive', 'qtr', 'down', 'TimeSecs', 'PlayTimeDiff', 'yrdline100', 'ydstogo', 'ydsnet', 'FirstDown', 'PosTeamScore', 'DefTeamScore', 'month_day', ]
+    var_category        = ['posteam', 'DefensiveTeam','PlayType','PlayType_lag']
     
-    import datetime, time
-    import re, random, sys
-    from pyspark.ml import PipelineModel
+    transformed_set             = {}
+    if var_target != None:
+        transformed_set[var_target] = rawdata[var_target]
     
-    from pyspark import SparkContext, SparkConf
-    from pyspark.sql import SparkSession
+    for var in var_numeric:
+        transformed_set[var] = rawdata[var]
     
-    spark = SparkSession \
-        .builder \
-        .appName("pyspark_nfl_prediction") \
-        .getOrCreate()
+    '''
+    for var in var_category:
+        transformed_set[var] = rawdata[var].astype('category').cat.codes
+    '''
     
-    #Drive          = ''' + str(1) + '''
-    qtr             = ''' + str(qtr) + '''
-    down            = ''' + str(down) + '''
-    #TimeUnder      = ''' + str(15) + '''
-    TimeSecs        = ''' + str(TimeSecs) + '''
-    #PlayTimeDiff   = ''' + str(20) + '''
-    yrdline100      = ''' + str(yrdline100) + '''
-    ydstogo         = ''' + str(ydstogo) + '''
-    ydsnet          = ''' + str(ydsnet) + '''
-    month_day       = ''' + str(month_day) + '''
-    PlayType_lag    = "''' + str(PlayType_lag) + '''"
+    category_coding = {}
+    for var in var_category:
+        category_coding[var] = dict( enumerate( rawdata[var].astype('category').cat.categories ))
+        transformed_set[var] = rawdata[var].astype('category').cat.codes
     
-    input_df = spark.createDataFrame( [(qtr, down, TimeSecs, yrdline100, ydstogo, ydsnet, month_day, PlayType_lag)], ['qtr','down','TimeSecs','yrdline100','ydstogo','ydsnet','month_day','PlayType_lag'])
+    extracted_year  = pd.to_datetime(rawdata[var_date]).dt.year
+    extracted_month = pd.to_datetime(rawdata[var_date]).dt.month
+    extracted_day   = pd.to_datetime(rawdata[var_date]).dt.day
     
-    model_pass = PipelineModel.load('/models/nfl_model_pass')
-    model_run  = PipelineModel.load('/models/nfl_model_run')
+    transformed_set['year']  = extracted_year
+    transformed_set['month'] = extracted_month
+    transformed_set['day']   = extracted_day
     
-    passing_yards = model_pass.transform(input_df).select('prediction').collect()[0][0]
-    running_yards = model_run.transform(input_df).select('prediction').collect()[0][0]
-    
-    best_play     = 'Passing Play' if passing_yards > running_yards else 'Running Play'
-    
-    print({'passing_yards':passing_yards, 'running_yards':running_yards, 'best_play':best_play})
-    
-    '''}
-    
-    if session_id:
-        session_id, result = spark_livy_interactive(host='dzaratsian4.field.hortonworks.com', port='8999', code_payload=code_payload, session_id=session_id)
-    else:
-        session_id, result = spark_livy_interactive(host='dzaratsian4.field.hortonworks.com', port='8999', code_payload=code_payload, session_id='')
+    # Create transformed DF
+    transformed_df = pd.concat([v for k,v in transformed_set.items()], axis=1)
+    transformed_df.columns = [k for k,v in transformed_set.items()]
+    transformed_df.head()
+    return transformed_df
 
 
-def start_livy_and_load_model(host='dzaratsian4.field.hortonworks.com', port='8999'):
+def predict_run_play(nfl_model_path, variable_dict, PlayType):
+    # PlayType is either "Run" or "Pass" 
     
-    code_payload = {'code': '''
+    row_number   = int(request.form.get('row_number',''))
+    variable_map['PlayType'] = PlayType
+    rawdata = pd.DataFrame(variable_map, index=[0])
     
-    import datetime, time
-    import re, random, sys
-    from pyspark.ml import PipelineModel
+    # Transform / Prep dataframe
+    transformed_df = transform_df(rawdata, None)
     
-    from pyspark import SparkContext, SparkConf
-    from pyspark.sql import SparkSession
+    # Score Data
+    scored_df = score_data(nfl_model_path, transformed_df)
+    #scored_df['actual'] = rawdata['Yards_Gained']
     
-    spark = SparkSession \
-        .builder \
-        .appName("pyspark_nfl_prediction") \
-        .getOrCreate()
+    prediction = round(float(scored_df['predicted']),2)
     
-    model_pass = PipelineModel.load('./static/assets/nfl_model_pass')
-    model_run  = PipelineModel.load('./static/assets/nfl_model_run')
-    
-    '''}
-    
-    session_id, result = spark_livy_interactive(host=host, port=port, code_payload=code_payload, session_id='')
-    return session_id, result
-
+    return prediction
 
 
 ################################################################################################
@@ -173,28 +165,34 @@ def index():
     
     if request.method == 'POST':
         row_number      = int(request.form.get('row_number',''))
-        datestamp       = request.form.get('datestamp','')
-        posteam         = request.form.get('posteam','')
-        DefensiveTeam   = request.form.get('DefensiveTeam','')
-        #drive          = request.form.get('drive','')
-        qtr             = int(request.form.get('quarter',''))
-        down            = int(request.form.get('down',''))
-        TimeSecs        = int(request.form.get('timesecs',''))
-        yrdline100      = int(request.form.get('yrdline100',''))
-        ydstogo         = int(request.form.get('ydstogo',''))
-        ydsnet          = int(request.form.get('ydsnet',''))
-        month_day       = int( datestamp[5:7] + datestamp[8:10] )
-        PlayType_lag    = request.form.get('playtype_lag','')
         
-        best_play, passing_yards, running_yards = predict_play(model_pass, model_run, qtr, down, TimeSecs, yrdline100, ydstogo, ydsnet, month_day, posteam, DefensiveTeam, PlayType_lag)
-        #best_play, passing_yards, running_yards = predict_play(model_pass, model_run, qtr, down, TimeSecs, yrdline100, ydstogo, ydsnet, month_day, posteam, DefensiveTeam, PlayType_lag)
+        variable_dict = {
+            'Date':         str(request.form.get('datestamp','')) + 'T00:00:00.000Z',
+            'Drive':        int(random.randint(1,6)),
+            'qtr':          int(request.form.get('quarter','')),
+            'down':         int(request.form.get('down','')),
+            'TimeSecs':     int(request.form.get('timesecs','')),
+            'PlayTimeDiff': int(random.randint(1,35)),,
+            'yrdline100':   int(request.form.get('yrdline100','')),
+            'ydstogo':      int(request.form.get('ydstogo','')),
+            'ydsnet':       int(request.form.get('ydsnet','')),
+            'FirstDown':    int(random.randint(0,1)),
+            'PosTeamScore': int(random.randint(1,40)),
+            'DefTeamScore': int(random.randint(1,30)),
+            'month_day':    int( datestamp[5:7] + datestamp[8:10] ),
+            'posteam':      request.form.get('posteam',''),
+            'DefensiveTeam':request.form.get('DefensiveTeam',''),
+            'PlayType_lag': request.form.get('playtype_lag',''),
+        }
+        
+        running_yards = predict_run_play(nfl_model_path, variable_dict, "Run")
+        passing_yarsd = predict_run_play(nfl_model_path, variable_dict, "Pass")
+        best_play     = 'Passing Play' if passing_yards > running_yards else 'Running Play'
         
         row_number = row_number + 1
         next_play, date = get_next_play(rawdata, row_number)
         
-        #return render_template('index.html', playtypes=playtypes, next_play=next_play, date=date, row_number=row_number)
         return render_template('index.html', playtypes=playtypes, posteams=list_of_teams, DefensiveTeams=list_of_teams, next_play=next_play, date=date, row_number=row_number, best_play=best_play, passing_yards=round(passing_yards,2), running_yards=round(running_yards,2))
-
 
 
 ################################################################################################
@@ -247,6 +245,8 @@ def api():
 ################################################################################################
 
 if __name__ == "__main__":
+    
+    nfl_model_path = os.path.join( os.getcwd(), 'static/assets/model.joblib')
     
     #app.run(debug=True, threaded=False, host='0.0.0.0', port=4444)
     app.run(threaded=False, host='0.0.0.0', port=8500)
