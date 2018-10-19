@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+
+    <title>NFL App</title>
+	<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="">
+	<meta name="author" content="" />
+
+	<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:400italic,600italic,800italic,400,600,800" type="text/css">
+	<link rel="stylesheet" href="../static/css/font-awesome.min.css" type="text/css" />		
+	<link rel="stylesheet" href="../static/css/bootstrap.min.css" type="text/css" />	
+	<link rel="stylesheet" href="../static/js/libs/css/ui-lightness/jquery-ui-1.9.2.custom.css" type="text/css" />		
+	<link rel="stylesheet" href="../static/js/plugins/select2/select2.css" type="text/css" />
+	<link rel="stylesheet" href="../static/js/plugins/magnific/magnific-popup.css" type="text/css" />
+	<link rel="stylesheet" href="../static/js/plugins/icheck/skins/minimal/blue.css" type="text/css" />
+	<link rel="stylesheet" href="../static/css/App.css" type="text/css" />
+	<link rel="stylesheet" href="../static/css/custom.css" type="text/css" />
+	
+	<link rel="stylesheet" href="../static/js/plugins/datepicker/datepicker.css" type="text/css" />
+	<link rel="stylesheet" href="../static/js/plugins/simplecolorpicker/jquery.simplecolorpicker.css" type="text/css" />
+	<link rel="stylesheet" href="../static/js/plugins/timepicker/bootstrap-timepicker.css" type="text/css" />
+	<link rel="stylesheet" href="../static/js/plugins/fileupload/bootstrap-fileupload.css" type="text/css" />
+
+
+</head>
+
+<body>
+
+<div id="wrapper">
+
+	<header id="header">
+		<!--
+		<h1 id="site-logo">
+			<a href="./index.html">
+				<img src="./img/logos/logo.png" alt="Site Logo" />
+			</a>
+		</h1>	
+		-->
+
+		<a href="javascript:;" data-toggle="collapse" data-target=".top-bar-collapse" id="top-bar-toggle" class="navbar-toggle collapsed">
+			<i class="fa fa-cog"></i>
+		</a>
+
+
+	</header> <!-- header -->
+
+	<div id="sidebar-wrapper" class="collapse sidebar-collapse">
+	
+		<div id="search">
+			<!--
+			<form>
+				<input class="form-control input-sm" type="text" name="search" placeholder="Search..." />
+				<button type="submit" id="search-btn" class="btn"><i class="fa fa-search"></i></button>
+			</form>		
+			-->
+		</div> <!-- #search -->
+		
+		<!--
+		<nav id="sidebar">		
+			
+			<ul id="main-nav" class="open-active">			
+
+				<li class="">				
+					<a href="#">
+						<i class="fa fa-dashboard"></i>
+						Dashboard
+					</a>				
+				</li>
+
+			</ul>
+					
+		</nav>
+		-->
+
+	</div> <!-- /#sidebar-wrapper -->
+
+	
+	<div id="content_full">		
+		
+		<div id="content-header">
+			<br><br>
+			<center><b><font size="5">NFL App</font></b></center> 
+		</div> <!-- #content-header -->	
+
+
+
+
+		<div id="content-container">			
+
+			<!--
+			<center><img src="./static/img/nfl_banner2.png" style="width: 100%"></center>
+
+			<br><br>
+			-->
+
+			<div class="row">
+
+				<div class="col-md-1"></div>
+				
+				<div class="col-md-10">
+
+					<div class="portlet">
+
+
+						<center><img src="./static/img/nfl_banner2.png" style="width: 100%"></center>
+
+						<div class="portlet-content">
+
+								<div class="tab-content stacked-content">
+
+
+									<div class="row">
+
+										<div class="col-md-6">
+
+		                                    <form class="form-signin" action="/index" method="POST">
+
+
+		                                        <div class="form-group">
+		                                            <input type="hidden" id="row_number" name="row_number" value="{{ row_number }}">
+		                                        </div>
+
+		                                        <div class="row">
+		                                        <div class="form-group">    
+		                                            <label class="col-md-5"><font size="4">Date:</font></label>
+		                                            <div id="datestamp" name="datestamp" class="col-md-6 date" data-auto-close="true" data-date="2016-10-30" data-date-format="yyyy-mm-dd" data-date-autoclose="true">
+		                                                <input id="datestamp" name="datestamp" class="form-control" type="text" value="{{ date }}" style="font-size:18px;">
+		                                                <!--<span class="input-group-addon"><i class="fa fa-calendar"></i></span>-->
+		                                            </div>
+		                                        </div>
+		                                        </div>
+
+		                                        
+		                                        <div class="row">
+		                                        <div class="form-group">    
+		                                            <label class="col-md-5"><font size="4">Offensive Team:</font></label>
+		                                            <div class="col-md-6">
+		                                            <select id="posteam" name="posteam" class="form-control"  style="font-size:18px;">
+		                                                {% for posteam in posteams %}
+		                                                    <option value="{{ posteam }}" {% if posteam == next_play[13] %} selected {% endif %}">{{ posteam }}</option>
+		                                                {% endfor %}
+		                                            </select>
+		                                            </div>
+		                                        </div>
+		                                        </div>
+		                                        
+
+		                                        
+		                                        <div class="row">
+		                                        <div class="form-group">    
+		                                            <label class="col-md-5"><font size="4">Defensive Team:</font></label>
+		                                            <div class="col-md-6">
+		                                            <select id="DefensiveTeam" name="DefensiveTeam" class="form-control"  style="font-size:18px;">
+		                                                {% for DefensiveTeam in DefensiveTeams %}
+		                                                    <option value="{{ DefensiveTeam }}" {% if DefensiveTeam == next_play[14] %} selected {% endif %}">{{ DefensiveTeam }}</option>
+		                                                {% endfor %}
+		                                            </select>
+		                                            </div>
+		                                        </div>
+		                                        </div>
+		                                        
+
+		                                        <!--
+		                                        <div class="row">
+		                                        <div class="form-group">    
+		                                            <label class="col-md-3">Drive Number:</label>
+		                                            <div class="col-md-9">
+		                                                <input type="text" id="drive" name="drive" class="form-control">
+		                                            </div>
+		                                        </div>
+		                                        </div>
+		                                        -->
+
+		                                        <div class="row">
+		                                        <div class="form-group">    
+		                                            <label class="col-md-5"><font size="4">Quarter:</font></label>
+		                                            <div class="col-md-6">
+		                                                <input type="text" id="quarter" name="quarter" class="form-control" value="{{ next_play[3] }}" style="font-size:18px;">
+		                                            </div>
+		                                        </div>
+		                                        </div>
+
+		                                        <div class="row">
+		                                        <div class="form-group">    
+		                                            <label class="col-md-5"><font size="4">Down:</font></label>
+		                                            <div class="col-md-6">
+		                                                <input type="text" id="down" name="down" class="form-control" value="{{ next_play[4] }}" style="font-size:18px;">
+		                                            </div>
+		                                        </div>
+		                                        </div>
+
+		                                        <div class="row">
+		                                        <div class="form-group">    
+		                                            <label class="col-md-5"><font size="4">Seconds Remaining:</font></label>
+		                                            <div class="col-md-6">
+		                                                <input type="text" id="timesecs" name="timesecs" class="form-control" value="{{ next_play[7] }}" style="font-size:18px;">
+		                                            </div>
+		                                        </div>
+		                                        </div>
+
+		                                        <div class="row">
+		                                        <div class="form-group">    
+		                                            <label class="col-md-5"><font size="4">Yards to Goal Line:</font></label>
+		                                            <div class="col-md-6">
+		                                                <input type="text" id="yrdline100" name="yrdline100" class="form-control" value="{{ next_play[9] }}" style="font-size:18px;">
+		                                            </div>
+		                                        </div>
+		                                        </div>
+		                                        
+		                                        <div class="row">
+		                                        <div class="form-group">    
+		                                            <label class="col-md-5"><font size="4">Yards to First Down:</font></label>
+		                                            <div class="col-md-6">
+		                                                <input type="text" id="ydstogo" name="ydstogo" class="form-control" value="{{ next_play[10] }}" style="font-size:18px;">
+		                                            </div>
+		                                        </div>
+		                                        </div>
+
+		                                        <div class="row">
+		                                        <div class="form-group">    
+		                                            <label class="col-md-5"><font size="4">Net Yards (this drive):</font></label>
+		                                            <div class="col-md-6">
+		                                                <input type="text" id="ydsnet" name="ydsnet" class="form-control" value="{{ next_play[11] }}" style="font-size:18px;">
+		                                            </div>
+		                                        </div>
+		                                        </div>
+
+		                                        <div class="row">
+		                                        <div class="form-group">    
+		                                            <label class="col-md-5"><font size="4">Previous Play Type:</font></label>
+		                                            <div class="col-md-6">
+		                                            <select id="playtype_lag" name="playtype_lag" class="form-control"  style="font-size:18px;">
+		                                                {% for playtype in playtypes %}
+		                                                    <option value="{{ playtype }}" {% if playtype == next_play[24] %} selected {% endif %}">{{ playtype }}</option>
+		                                                {% endfor %}
+		                                            </select>
+		                                            </div>
+		                                        </div>
+		                                        </div>
+
+		                                        <div class="row">
+		                                            <div class="col-md-4"></div>
+		                                            <div class="form-group">
+		                                                <center>
+		                                                <div class="col-md-8">
+		                                                    <br>
+		                                                    <button type="submit" class="btn btn-info"><font size="4">Recommend Play</font></button>
+		                                                </div> <!-- /.col -->
+		                                                </center>
+		                                            </div> <!-- /.form-group -->
+		                                            <div class="col-md-2"></div>
+		                                        </div>
+
+
+
+		                                    </form>
+
+
+										</div>
+
+
+
+
+										{% if passing_yards and running_yards %}
+
+										<div class="col-md-6">
+
+											<div class="row">
+												<div class="col-md-2"></div>
+								                <div class="col-md-4">
+								                    <center>
+								                        <img src="./static/img/{% if best_play == 'Passing Play' %}football_pass_green.jpg{% else %}football_pass_red.jpg{% endif %}" style="width: 100%">
+								                    </center>
+								                </div>
+								                <div class="col-md-4">
+							             			<center>
+							                        <br><font size="4"><b>Passing Play</b></font>
+							                        <br><font size="4"><b>Predicted Yards:<br><font size="6">{{ passing_yards }}</font></b></font>
+							                        </center>
+								                </div>
+								                <div class="col-md-2"></div>
+											</div>
+
+											<br>
+
+											<div class="row">
+												<div class="col-md-2"></div>
+								                <div class="col-md-4">
+								                    <center>
+								                        <img src="./static/img/{% if best_play == 'Passing Play' %}football_run_red.jpg{% else %}football_run_green.jpg{% endif %}" style="width: 100%">
+								                    </center>
+								                </div>
+								                <div class="col-md-4">
+								                	<center>
+							                        <br><font size="4"><b>Running Play</b></font>
+							                        <br><font size="4"><b>Predicted Yards:<br><font size="6">{{ running_yards }}</font></b></font>
+							                        </center>								                
+								                </div>
+								                <div class="col-md-2"></div>
+											</div>
+											
+										</div>
+
+										{% endif %}
+
+
+
+									</div>
+
+
+							    </div>
+
+						</div> <!-- /.portlet-content -->
+
+					</div> <!-- /.portlet -->
+
+				</div> <!-- /col-md -->
+
+				<div class="col-md-1"></div>
+
+			</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+		</div> <!-- /#content-container -->
+		
+	</div> <!-- #content -->
+	
+	
+</div> <!-- #wrapper -->
+
+<footer id="footer">
+	<ul class="nav pull-right">
+		<li>
+			Copyright &copy; 2017
+		</li>
+	</ul>
+</footer>
+
+<!--
+##################################
+Function to delete row in table
+##################################
+-->
+<script>
+	function deleteRow(btn){
+		var row = btn.parentNode.parentNode;
+		row.parentNode.removeChild(row)
+	}
+</script>
+
+
+
+
+
+<script>
+function update_values() {
+            $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+            $.getJSON($SCRIPT_ROOT+"/mytest",
+                function(data) {
+                    $("#zout").text(data.zout+" %")
+                });
+        }
+</script>
+
+
+<script src="../static/js/libs/jquery-1.9.1.min.js"></script>
+<script src="../static/js/libs/jquery-ui-1.9.2.custom.min.js"></script>
+<script src="../static/js/libs/bootstrap.min.js"></script>
+<script src="../static/js/App.js"></script>
+<script src="../static/js/popups.js"></script>
+<script src="../static/js/plugins/howl/howl.js"></script>
+<script src="../static/js/plugins/select2/select2.js"></script>
+<script src="../static/js/plugins/icheck/jquery.icheck.js"></script>
+<script src="../static/js/plugins/magnific/jquery.magnific-popup.min.js"></script>
+<script src="../static/js/plugins/magnific/jquery.magnific-popup.min.js"></script>
+<script src="../static/js/plugins/datepicker/bootstrap-datepicker.js"></script>
+<script src="../static/js/plugins/timepicker/bootstrap-timepicker.js"></script>
+<script src="../static/js/plugins/simplecolorpicker/jquery.simplecolorpicker.js"></script>
+<script src="../static/js/plugins/autosize/jquery.autosize.min.js"></script>
+<script src="../static/js/plugins/textarea-counter/jquery.textarea-counter.js"></script>
+<script src="../static/js/plugins/fileupload/bootstrap-fileupload.js"></script>
+<script src="../static/js/demos/form-extended.js"></script>
+
+</body>
+</html>

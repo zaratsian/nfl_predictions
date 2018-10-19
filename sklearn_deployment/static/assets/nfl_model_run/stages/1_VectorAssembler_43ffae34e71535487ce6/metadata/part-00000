@@ -1,0 +1,1 @@
+{"class":"org.apache.spark.ml.feature.VectorAssembler","timestamp":1508803772726,"sparkVersion":"2.1.0","uid":"VectorAssembler_43ffae34e71535487ce6","paramMap":{"outputCol":"features","inputCols":["qtr","down","TimeSecs","yrdline100","ydstogo","ydsnet","month_day","PlayType_lag_index"]}}
