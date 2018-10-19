@@ -134,8 +134,8 @@ def predict_run_play(nfl_model_path, variable_dict, PlayType):
     # PlayType is either "Run" or "Pass" 
     
     row_number   = int(request.form.get('row_number',''))
-    variable_map['PlayType'] = PlayType
-    rawdata = pd.DataFrame(variable_map, index=[0])
+    variable_dict['PlayType'] = PlayType
+    rawdata = pd.DataFrame(variable_dict, index=[0])
     
     # Transform / Prep dataframe
     transformed_df = transform_df(rawdata, None)
@@ -165,14 +165,14 @@ def index():
     
     if request.method == 'POST':
         row_number      = int(request.form.get('row_number',''))
-        
+        datestamp       = request.form.get('datestamp','')
         variable_dict = {
-            'Date':         str(request.form.get('datestamp','')) + 'T00:00:00.000Z',
+            'Date':         str(datestamp) + 'T00:00:00.000Z',
             'Drive':        int(random.randint(1,6)),
             'qtr':          int(request.form.get('quarter','')),
             'down':         int(request.form.get('down','')),
             'TimeSecs':     int(request.form.get('timesecs','')),
-            'PlayTimeDiff': int(random.randint(1,35)),,
+            'PlayTimeDiff': int(random.randint(1,35)),
             'yrdline100':   int(request.form.get('yrdline100','')),
             'ydstogo':      int(request.form.get('ydstogo','')),
             'ydsnet':       int(request.form.get('ydsnet','')),
@@ -186,7 +186,7 @@ def index():
         }
         
         running_yards = predict_run_play(nfl_model_path, variable_dict, "Run")
-        passing_yarsd = predict_run_play(nfl_model_path, variable_dict, "Pass")
+        passing_yards = predict_run_play(nfl_model_path, variable_dict, "Pass")
         best_play     = 'Passing Play' if passing_yards > running_yards else 'Running Play'
         
         row_number = row_number + 1
