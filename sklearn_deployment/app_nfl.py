@@ -95,8 +95,8 @@ def transform_df(rawdata, target_variable_name=None):
     var_id              = ''
     var_target          = target_variable_name #'Yards_Gained'
     var_date            = 'Date'
-    var_numeric         = ['Drive', 'qtr', 'down', 'TimeSecs', 'PlayTimeDiff', 'yrdline100', 'ydstogo', 'ydsnet', 'FirstDown', 'PosTeamScore', 'DefTeamScore', 'month_day', ]
-    var_category        = ['posteam', 'DefensiveTeam','PlayType','PlayType_lag']
+    var_numeric         = ['Drive', 'qtr', 'down', 'TimeSecs', 'PlayTimeDiff', 'yrdline100', 'ydstogo', 'ydsnet', 'FirstDown', 'PosTeamScore', 'DefTeamScore'] # 'month_day']
+    var_category        = ['posteam', 'DefensiveTeam','PlayType_lag'] # 'PlayType']
     
     transformed_set             = {}
     if var_target != None:
@@ -134,7 +134,7 @@ def predict_run_play(nfl_model_path, variable_dict, PlayType):
     # PlayType is either "Run" or "Pass" 
     
     row_number   = int(request.form.get('row_number',''))
-    variable_dict['PlayType'] = PlayType
+    #variable_dict['PlayType'] = PlayType
     rawdata = pd.DataFrame(variable_dict, index=[0])
     
     # Transform / Prep dataframe
@@ -185,8 +185,8 @@ def index():
             'PlayType_lag': request.form.get('playtype_lag',''),
         }
         
-        running_yards = predict_run_play(nfl_model_path, variable_dict, "Run")
-        passing_yards = predict_run_play(nfl_model_path, variable_dict, "Pass")
+        running_yards = predict_run_play(nfl_model_running, variable_dict, "Run")
+        passing_yards = predict_run_play(nfl_model_passing, variable_dict, "Pass")
         best_play     = 'Passing Play' if passing_yards > running_yards else 'Running Play'
         
         row_number = row_number + 1
@@ -246,7 +246,8 @@ def api():
 
 if __name__ == "__main__":
     
-    nfl_model_path = os.path.join( os.getcwd(), 'static/assets/model.joblib')
+    nfl_model_running = os.path.join( os.getcwd(), 'static/assets/nfl_model_running.joblib')
+    nfl_model_passing = os.path.join( os.getcwd(), 'static/assets/nfl_model_passing.joblib')
     
     #app.run(debug=True, threaded=False, host='0.0.0.0', port=4444)
     app.run(threaded=False, host='0.0.0.0', port=8500)
