@@ -69,6 +69,14 @@ header, rawdata = import_csv( os.path.join( os.getcwd(), 'static/assets/nfldata2
 header = data_header
 
 
+def load_models():
+    nfl_model_running = os.path.join( os.getcwd(), 'static/assets/nfl_model_running.joblib')
+    nfl_model_passing = os.path.join( os.getcwd(), 'static/assets/nfl_model_passing.joblib')
+    return nfl_model_running, nfl_model_passing
+
+nfl_model_running, nfl_model_passing = load_models()
+
+
 def get_next_play(rawdata, row_number):
     record = rawdata[row_number]
     date   = record[0][0:10]
