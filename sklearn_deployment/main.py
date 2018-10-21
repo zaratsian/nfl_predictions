@@ -168,9 +168,6 @@ def index():
         row_number = 0
         next_play, date = get_next_play(rawdata, row_number)
         
-        nfl_model_running = os.path.join( os.getcwd(), 'static/assets/nfl_model_running.joblib')
-        nfl_model_passing = os.path.join( os.getcwd(), 'static/assets/nfl_model_passing.joblib')
-        
         return render_template('index.html', playtypes=playtypes, posteams=list_of_teams, DefensiveTeams=list_of_teams, next_play=next_play, date=date, row_number=row_number)
     
     if request.method == 'POST':
