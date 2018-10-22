@@ -1,5 +1,7 @@
 runtime: python37
 
+instance_class: F4
+
 handlers:
   # This configures Google App Engine to serve the files in the app's static
   # directory.
