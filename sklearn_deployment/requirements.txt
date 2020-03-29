@@ -1,5 +1,6 @@
-flask
-pandas
-numpy
-requests
-sklearn
+Flask==1.1.1
+pandas==1.0.3
+numpy==1.18.2
+requests==2.23.0
+#sklearn==0.20.3
+scikit-learn==0.20.0
